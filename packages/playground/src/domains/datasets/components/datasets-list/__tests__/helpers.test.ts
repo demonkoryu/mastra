@@ -14,9 +14,9 @@ describe('getDatasetTargetTypes', () => {
   });
 
   it('ignores experiments without a targetType', () => {
-    expect(getDatasetTargetTypes(undefined, [{ targetType: undefined }, { targetType: null }, { targetType: 'agent' }])).toEqual([
-      'agent',
-    ]);
+    expect(
+      getDatasetTargetTypes(undefined, [{ targetType: undefined }, { targetType: null }, { targetType: 'agent' }]),
+    ).toEqual(['agent']);
   });
 
   it('returns an empty list when neither the dataset nor its experiments carry a type', () => {

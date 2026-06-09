@@ -9,7 +9,8 @@ afterEach(cleanup);
 // The stored `EntityType` enum is lowercase (`agent`, `workflow_run`). The icon switch used to
 // match only uppercase, so real traces rendered no Agent/Workflow icon. These guard the casing fix.
 describe('TracesDataListEntityCell entity icon', () => {
-  const renderCell = (entityType: string) => render(<TracesDataListEntityCell entityType={entityType} entityName="x" />);
+  const renderCell = (entityType: string) =>
+    render(<TracesDataListEntityCell entityType={entityType} entityName="x" />);
 
   it('renders an icon for the lowercase stored value "agent"', () => {
     expect(renderCell('agent').container.querySelector('svg')).not.toBeNull();
