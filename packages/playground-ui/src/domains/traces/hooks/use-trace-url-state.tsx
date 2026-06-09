@@ -273,12 +273,21 @@ export function useTraceUrlState(
 
   const handleSpanChangeWithTab = useCallback(
     (spanId: string, tab: SpanTab) => {
+      const nextTab = tab && tab !== 'details' ? tab : null;
+      // No-op guard (same pattern as the sibling handlers): skip the navigation only when span,
+      // tab AND score are already exactly what this call would produce.
+      const isNoOp =
+        spanId === (searchParams.get(SPAN_ID_PARAM) || null) &&
+        nextTab === (searchParams.get(TAB_PARAM) || null) &&
+        !searchParams.get(SCORE_ID_PARAM);
+      if (isNoOp) return;
+
       setSearchParams(
         prev => {
           const next = new URLSearchParams(prev);
           next.set(SPAN_ID_PARAM, spanId);
-          if (tab && tab !== 'details') {
-            next.set(TAB_PARAM, tab);
+          if (nextTab) {
+            next.set(TAB_PARAM, nextTab);
           } else {
             next.delete(TAB_PARAM);
           }
@@ -288,7 +297,7 @@ export function useTraceUrlState(
         { replace: true },
       );
     },
-    [setSearchParams],
+    [searchParams, setSearchParams],
   );
 
   const handleScoreChange = useCallback(

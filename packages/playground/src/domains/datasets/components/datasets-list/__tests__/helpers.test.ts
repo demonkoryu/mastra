@@ -7,9 +7,9 @@ describe('getDatasetTargetTypes', () => {
     expect(getDatasetTargetTypes('workflow', [{ targetType: 'agent' }])).toEqual(['workflow']);
   });
 
-  it('derives distinct target types from experiments when the dataset has none', () => {
+  it('derives distinct target types from experiments when the dataset has none, in stable sorted order', () => {
     expect(
-      getDatasetTargetTypes(null, [{ targetType: 'agent' }, { targetType: 'agent' }, { targetType: 'workflow' }]),
+      getDatasetTargetTypes(null, [{ targetType: 'workflow' }, { targetType: 'agent' }, { targetType: 'agent' }]),
     ).toEqual(['agent', 'workflow']);
   });
 

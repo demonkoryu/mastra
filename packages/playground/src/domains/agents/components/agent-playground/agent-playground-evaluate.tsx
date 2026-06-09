@@ -712,7 +712,12 @@ export function AgentPlaygroundEvaluate({
     return (
       <>
         {/* Create Dataset Dialog */}
-        <CreateDatasetDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} targetIds={[agentId]} />
+        <CreateDatasetDialog
+          open={showCreateDialog}
+          onOpenChange={setShowCreateDialog}
+          targetType="agent"
+          targetIds={[agentId]}
+        />
 
         {/* Generate Config Dialog */}
         {generateDatasetId && (
@@ -754,9 +759,10 @@ export function AgentPlaygroundEvaluate({
                       try {
                         await updateDataset.mutateAsync({
                           datasetId: ds.id,
-                          // Attaching from an agent's Evaluate view → the dataset targets an agent.
-                          // Persist the type so the Datasets list/filter can classify it.
-                          targetType: 'agent',
+                          // Attaching from an agent's Evaluate view → default the type to agent so
+                          // the Datasets list/filter can classify it, but never overwrite a type
+                          // the dataset already has (e.g. a workflow dataset being reused).
+                          targetType: ds.targetType ?? 'agent',
                           targetIds: [...parseIdList(ds.targetIds), agentId],
                         });
                         toast.success(`Dataset "${ds.name}" attached`);

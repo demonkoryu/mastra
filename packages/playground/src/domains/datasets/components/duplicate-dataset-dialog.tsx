@@ -21,6 +21,7 @@ export interface DuplicateDatasetDialogProps {
   sourceDatasetId: string;
   sourceDatasetName: string;
   sourceDatasetDescription?: string;
+  sourceDatasetTargetType?: string | null;
   onSuccess?: (datasetId: string) => void;
 }
 
@@ -30,6 +31,7 @@ export function DuplicateDatasetDialog({
   sourceDatasetId,
   sourceDatasetName,
   sourceDatasetDescription,
+  sourceDatasetTargetType,
   onSuccess,
 }: DuplicateDatasetDialogProps) {
   const [name, setName] = useState('');
@@ -97,6 +99,8 @@ export function DuplicateDatasetDialog({
       const dataset = await createDataset.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
+        // Carry the source dataset's classification over so the copy keeps its Target column/filter.
+        targetType: sourceDatasetTargetType ?? undefined,
       });
 
       // Copy items to new dataset

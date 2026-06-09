@@ -228,6 +228,7 @@ function DatasetPage() {
           sourceDatasetId={dataset.id}
           sourceDatasetName={dataset.name}
           sourceDatasetDescription={(dataset as { description?: string }).description}
+          sourceDatasetTargetType={dataset.targetType}
         />
       )}
 

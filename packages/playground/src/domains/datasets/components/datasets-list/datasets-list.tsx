@@ -157,11 +157,11 @@ export function DatasetsList({
               <EntityList.TextCell>v{ds.version ?? 1}</EntityList.TextCell>
               <EntityList.Cell className="text-neutral4 text-ui-smd">
                 {ds.targetTypes.length > 0 ? (
-                  <span className="flex min-w-0 items-center gap-2">
+                  <span className="flex min-w-0 items-center gap-2 overflow-hidden">
                     {ds.targetTypes.map(type => (
-                      <span key={type} className="flex items-center gap-1 capitalize">
+                      <span key={type} className="flex min-w-0 items-center gap-1 capitalize">
                         <TargetTypeIcon type={type} />
-                        {type}
+                        <span className="truncate">{type}</span>
                       </span>
                     ))}
                   </span>

@@ -53,6 +53,23 @@ describe('useTraceUrlState.handleSpanChangeWithTab', () => {
     expect(p.get('scoreId')).toBeNull();
   });
 
+  it('skips the navigation entirely when span, tab and score already match', () => {
+    render(<Harness initial="traceId=t1&spanId=s1&tab=scoring" />);
+
+    act(() => api.handleSpanChangeWithTab('s1', 'scoring'));
+
+    expect(setSpy).not.toHaveBeenCalled();
+  });
+
+  it('still navigates when only a stale scoreId needs clearing', () => {
+    render(<Harness initial="traceId=t1&spanId=s1&tab=scoring&scoreId=sc1" />);
+
+    act(() => api.handleSpanChangeWithTab('s1', 'scoring'));
+
+    expect(setSpy).toHaveBeenCalledTimes(1);
+    expect(new URLSearchParams(currentSearch).get('scoreId')).toBeNull();
+  });
+
   it("omits the tab param for the default 'details' tab", () => {
     render(<Harness initial="traceId=t1" />);
 

@@ -1,9 +1,12 @@
 import type { DatasetRecord } from '@mastra/client-js';
 
+// Keep in sync with the create/edit dialogs' DATASET_TARGET_TYPE_OPTIONS — every type a dataset
+// can be given must also be filterable here.
 export const DATASET_TARGET_OPTIONS = [
   { value: 'all', label: 'All targets' },
   { value: 'agent', label: 'Agent' },
   { value: 'workflow', label: 'Workflow' },
+  { value: 'scorer', label: 'Scorer' },
 ] as const;
 
 export const DATASET_EXPERIMENT_OPTIONS = [
@@ -21,7 +24,8 @@ export function getDatasetTargetTypes(
   experiments: Array<{ targetType?: string | null }>,
 ): string[] {
   if (targetType) return [targetType];
-  return Array.from(new Set(experiments.map(e => e.targetType).filter((t): t is string => Boolean(t))));
+  // Sorted so the derived list renders in a stable order regardless of experiment order.
+  return Array.from(new Set(experiments.map(e => e.targetType).filter((t): t is string => Boolean(t)))).sort();
 }
 
 export function getDatasetTagOptions(datasets: DatasetRecord[]) {
