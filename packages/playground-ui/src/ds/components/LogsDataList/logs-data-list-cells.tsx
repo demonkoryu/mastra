@@ -39,12 +39,15 @@ export function LogsDataListLevelCell({ level }: LogsDataListLevelCellProps) {
 
 function EntityTypeIcon({ entityType, className }: { entityType: string; className?: string }) {
   const iconClass = cn('size-3.5 shrink-0 text-neutral2', className);
-  switch (entityType) {
-    case 'AGENT':
+  // EntityType is persisted lowercase (`agent`, `workflow_run`, `tool`); normalize so the icon
+  // matches regardless of casing across the various producers.
+  switch (entityType.toLowerCase()) {
+    case 'agent':
       return <AgentIcon className={iconClass} aria-hidden />;
-    case 'WORKFLOW':
+    case 'workflow':
+    case 'workflow_run':
       return <WorkflowIcon className={iconClass} aria-hidden />;
-    case 'TOOL':
+    case 'tool':
       return <ToolsIcon className={iconClass} aria-hidden />;
     default:
       return null;

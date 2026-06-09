@@ -9,11 +9,13 @@ import {
   DialogBody,
   Input,
   Label,
+  SelectFieldBlock,
   toast,
 } from '@mastra/playground-ui';
 import { useState, useEffect } from 'react';
 import { useDatasetMutations } from '../hooks/use-dataset-mutations';
 import { SchemaConfigSection } from './schema-config-section';
+import { DATASET_TARGET_TYPE_OPTIONS } from './target-type-options';
 
 export interface EditDatasetDialogProps {
   open: boolean;
@@ -22,6 +24,7 @@ export interface EditDatasetDialogProps {
     id: string;
     name: string;
     description?: string;
+    targetType?: string | null;
     inputSchema?: Record<string, unknown> | null;
     groundTruthSchema?: Record<string, unknown> | null;
     requestContextSchema?: Record<string, unknown> | null;
@@ -39,6 +42,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
   const [requestContextSchema, setRequestContextSchema] = useState<Record<string, unknown> | null>(
     dataset.requestContextSchema ?? null,
   );
+  const [targetType, setTargetType] = useState(dataset.targetType ?? '');
   const [validationError, setValidationError] = useState<string | null>(null);
   const { updateDataset } = useDatasetMutations();
 
@@ -47,6 +51,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
     if (open) {
       setName(dataset.name);
       setDescription(dataset.description ?? '');
+      setTargetType(dataset.targetType ?? '');
       setInputSchema(dataset.inputSchema ?? null);
       setGroundTruthSchema(dataset.groundTruthSchema ?? null);
       setRequestContextSchema(dataset.requestContextSchema ?? null);
@@ -81,6 +86,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
         datasetId: dataset.id,
         name: name.trim(),
         description: description.trim() || undefined,
+        targetType: targetType || undefined,
         inputSchema,
         groundTruthSchema,
         requestContextSchema,
@@ -107,6 +113,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
     // Reset to original values
     setName(dataset.name);
     setDescription(dataset.description ?? '');
+    setTargetType(dataset.targetType ?? '');
     setInputSchema(dataset.inputSchema ?? null);
     setGroundTruthSchema(dataset.groundTruthSchema ?? null);
     setRequestContextSchema(dataset.requestContextSchema ?? null);
@@ -142,6 +149,17 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                 placeholder="Enter dataset description (optional)"
               />
             </div>
+
+            <SelectFieldBlock
+              label="Target type"
+              name="edit-dataset-target-type"
+              placeholder="Select a target type (optional)"
+              options={DATASET_TARGET_TYPE_OPTIONS}
+              value={targetType}
+              onValueChange={setTargetType}
+              helpText="What this dataset evaluates. Drives the Target column and the Agent/Workflow filter."
+              disabled={updateDataset.isPending}
+            />
 
             <SchemaConfigSection
               inputSchema={inputSchema}

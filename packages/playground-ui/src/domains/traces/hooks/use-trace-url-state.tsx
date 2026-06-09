@@ -98,6 +98,12 @@ export interface UseTraceUrlStateResult {
   /** Convenience: clears the featured span selection. Equivalent to `handleSpanChange(null)`. */
   handleSpanClose: () => void;
   handleSpanTabChange: (tab: SpanTab) => void;
+  /** Selects a span AND switches its panel tab in a single URL update. Use when both must change
+   *  from one interaction (e.g. "Evaluate Trace"). Calling `handleSpanChange` + `handleSpanTabChange`
+   *  separately races: each functional `setSearchParams` updater reads the same pre-update
+   *  `searchParams` snapshot, so the second navigation overwrites the first (last write wins) and one
+   *  of the two changes is lost on the first click. */
+  handleSpanChangeWithTab: (spanId: string, tab: SpanTab) => void;
   handleScoreChange: (scoreId: string | null) => void;
   /** Switches the list view between traces and branches. Clears the current selection. */
   handleListModeChange: (mode: TraceListMode) => void;
@@ -265,6 +271,26 @@ export function useTraceUrlState(
     [searchParams, setSearchParams],
   );
 
+  const handleSpanChangeWithTab = useCallback(
+    (spanId: string, tab: SpanTab) => {
+      setSearchParams(
+        prev => {
+          const next = new URLSearchParams(prev);
+          next.set(SPAN_ID_PARAM, spanId);
+          if (tab && tab !== 'details') {
+            next.set(TAB_PARAM, tab);
+          } else {
+            next.delete(TAB_PARAM);
+          }
+          next.delete(SCORE_ID_PARAM);
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   const handleScoreChange = useCallback(
     (scoreId: string | null) => {
       const currentScoreId = searchParams.get(SCORE_ID_PARAM) || null;
@@ -419,6 +445,7 @@ export function useTraceUrlState(
     handleSpanChange,
     handleSpanClose,
     handleSpanTabChange,
+    handleSpanChangeWithTab,
     handleScoreChange,
     handleListModeChange,
     handleFilterTokensChange,

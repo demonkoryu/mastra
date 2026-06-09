@@ -9,11 +9,13 @@ import {
   DialogBody,
   Input,
   Label,
+  SelectFieldBlock,
   toast,
 } from '@mastra/playground-ui';
 import { useState } from 'react';
 import { useDatasetMutations } from '../hooks/use-dataset-mutations';
 import { SchemaConfigSection } from './schema-config-section';
+import { DATASET_TARGET_TYPE_OPTIONS } from './target-type-options';
 
 export interface CreateDatasetDialogProps {
   open: boolean;
@@ -37,7 +39,14 @@ export function CreateDatasetDialog({
   const [groundTruthSchema, setGroundTruthSchema] = useState<Record<string, unknown> | null>(null);
   const [requestContextSchema, setRequestContextSchema] = useState<Record<string, unknown> | null>(null);
   const [showCustomSchema, setShowCustomSchema] = useState(!targetType);
+  // Only relevant for the generic (non-scoped) create. When the dialog is opened from an agent/
+  // workflow context, `targetType` is supplied via props and this picker is hidden.
+  const [selectedTargetType, setSelectedTargetType] = useState('');
   const { createDataset } = useDatasetMutations();
+
+  // Props win when the dialog is pre-scoped to a target; otherwise use the user's pick (if any).
+  const isPreScoped = Boolean(targetType);
+  const effectiveTargetType = targetType ?? (selectedTargetType || undefined);
 
   const handleSchemaChange = (schemas: {
     inputSchema: Record<string, unknown> | null;
@@ -64,7 +73,7 @@ export function CreateDatasetDialog({
         inputSchema,
         groundTruthSchema,
         requestContextSchema,
-        targetType,
+        targetType: effectiveTargetType,
         targetIds,
       })) as { id: string };
 
@@ -76,6 +85,7 @@ export function CreateDatasetDialog({
       setInputSchema(null);
       setGroundTruthSchema(null);
       setRequestContextSchema(null);
+      setSelectedTargetType('');
       setShowCustomSchema(!targetType);
       onOpenChange(false);
 
@@ -92,6 +102,7 @@ export function CreateDatasetDialog({
     setInputSchema(null);
     setGroundTruthSchema(null);
     setRequestContextSchema(null);
+    setSelectedTargetType('');
     setShowCustomSchema(!targetType);
     onOpenChange(false);
   };
@@ -124,6 +135,19 @@ export function CreateDatasetDialog({
                 placeholder="Enter dataset description (optional)"
               />
             </div>
+
+            {!isPreScoped && (
+              <SelectFieldBlock
+                label="Target type"
+                name="dataset-target-type"
+                placeholder="Select a target type (optional)"
+                options={DATASET_TARGET_TYPE_OPTIONS}
+                value={selectedTargetType}
+                onValueChange={setSelectedTargetType}
+                helpText="What this dataset evaluates. Drives the Target column and the Agent/Workflow filter."
+                disabled={createDataset.isPending}
+              />
+            )}
 
             {targetType && !showCustomSchema ? (
               <button

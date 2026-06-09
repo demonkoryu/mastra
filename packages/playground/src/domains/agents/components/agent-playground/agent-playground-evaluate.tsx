@@ -754,6 +754,9 @@ export function AgentPlaygroundEvaluate({
                       try {
                         await updateDataset.mutateAsync({
                           datasetId: ds.id,
+                          // Attaching from an agent's Evaluate view → the dataset targets an agent.
+                          // Persist the type so the Datasets list/filter can classify it.
+                          targetType: 'agent',
                           targetIds: [...parseIdList(ds.targetIds), agentId],
                         });
                         toast.success(`Dataset "${ds.name}" attached`);

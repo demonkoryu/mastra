@@ -12,6 +12,18 @@ export const DATASET_EXPERIMENT_OPTIONS = [
   { value: 'without', label: 'Without experiments' },
 ] as const;
 
+/** A dataset's `targetType` is the source of truth, but no create/import path populates it today,
+ *  so it's almost always null. When absent, fall back to the distinct target type(s) of the
+ *  dataset's experiments so the Target column and the Agent/Workflow filter can still classify it.
+ *  Returns one type when known, several for a dataset whose experiments span both. */
+export function getDatasetTargetTypes(
+  targetType: string | null | undefined,
+  experiments: Array<{ targetType?: string | null }>,
+): string[] {
+  if (targetType) return [targetType];
+  return Array.from(new Set(experiments.map(e => e.targetType).filter((t): t is string => Boolean(t))));
+}
+
 export function getDatasetTagOptions(datasets: DatasetRecord[]) {
   const tagSet = new Set<string>();
 

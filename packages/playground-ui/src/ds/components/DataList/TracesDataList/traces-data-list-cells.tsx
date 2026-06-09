@@ -61,11 +61,13 @@ export function TracesDataListInputCell({ input }: TracesDataListInputCellProps)
 
 function EntityTypeIcon({ entityType, className }: { entityType: string; className?: string }) {
   const iconClass = cn('size-3.5 shrink-0 text-neutral2', className);
-  switch (entityType) {
-    case 'AGENT':
+  // EntityType is persisted lowercase (`agent`, `workflow_run`); normalize so the icon matches
+  // regardless of casing across the various producers (observability vs scoring vocabularies).
+  switch (entityType.toLowerCase()) {
+    case 'agent':
       return <AgentIcon className={iconClass} aria-hidden />;
-    case 'WORKFLOW':
-    case 'WORKFLOW_RUN':
+    case 'workflow':
+    case 'workflow_run':
       return <WorkflowIcon className={iconClass} aria-hidden />;
     default:
       return null;
