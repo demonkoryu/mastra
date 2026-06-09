@@ -10,7 +10,7 @@ import {
 } from '@mastra/playground-ui';
 import { useMemo } from 'react';
 import { useLinkComponent } from '@/lib/framework';
-import { getDatasetTargetTypes } from './helpers';
+import { getDatasetTargetTypes, matchesDatasetTargetFilter } from './helpers';
 
 export interface DatasetsListProps {
   datasets: DatasetRecord[];
@@ -90,7 +90,7 @@ export function DatasetsList({
     const term = search.toLowerCase();
     return enrichedDatasets.filter(ds => {
       const matchesSearch = !term || ds.name.toLowerCase().includes(term);
-      const matchesTarget = targetFilter === 'all' || ds.targetTypes.includes(targetFilter);
+      const matchesTarget = matchesDatasetTargetFilter(ds.targetTypes, targetFilter);
       const matchesExperiment =
         experimentFilter === 'all' ||
         (experimentFilter === 'with' && ds.experimentCount > 0) ||

@@ -1,13 +1,24 @@
 import type { DatasetRecord } from '@mastra/client-js';
 
 // Keep in sync with the create/edit dialogs' DATASET_TARGET_TYPE_OPTIONS — every type a dataset
-// can be given must also be filterable here.
+// can be given must also be filterable here. 'none' surfaces legacy/untyped datasets (created
+// before targetType was persisted) so they can be found and classified instead of silently
+// disappearing under a type filter.
 export const DATASET_TARGET_OPTIONS = [
   { value: 'all', label: 'All targets' },
   { value: 'agent', label: 'Agent' },
   { value: 'workflow', label: 'Workflow' },
   { value: 'scorer', label: 'Scorer' },
+  { value: 'none', label: 'No target' },
 ] as const;
+
+/** Target-filter predicate for the Datasets list. `targetTypes` comes from
+ *  `getDatasetTargetTypes` (explicit type, or derived from experiments). */
+export function matchesDatasetTargetFilter(targetTypes: string[], targetFilter: string): boolean {
+  if (targetFilter === 'all') return true;
+  if (targetFilter === 'none') return targetTypes.length === 0;
+  return targetTypes.includes(targetFilter);
+}
 
 export const DATASET_EXPERIMENT_OPTIONS = [
   { value: 'all', label: 'All datasets' },

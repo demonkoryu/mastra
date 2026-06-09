@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getDatasetTargetTypes } from '../helpers';
+import { getDatasetTargetTypes, matchesDatasetTargetFilter } from '../helpers';
 
 describe('getDatasetTargetTypes', () => {
   it('uses the explicit dataset targetType when set, ignoring experiments', () => {
@@ -22,5 +22,24 @@ describe('getDatasetTargetTypes', () => {
   it('returns an empty list when neither the dataset nor its experiments carry a type', () => {
     expect(getDatasetTargetTypes(null, [])).toEqual([]);
     expect(getDatasetTargetTypes(undefined, [{ targetType: null }])).toEqual([]);
+  });
+});
+
+describe('matchesDatasetTargetFilter', () => {
+  it('matches everything for "all"', () => {
+    expect(matchesDatasetTargetFilter([], 'all')).toBe(true);
+    expect(matchesDatasetTargetFilter(['agent'], 'all')).toBe(true);
+  });
+
+  it('matches only untyped datasets for "none" — legacy datasets stay discoverable', () => {
+    expect(matchesDatasetTargetFilter([], 'none')).toBe(true);
+    expect(matchesDatasetTargetFilter(['agent'], 'none')).toBe(false);
+  });
+
+  it('matches a specific type, including the derived multi-type case', () => {
+    expect(matchesDatasetTargetFilter(['agent'], 'agent')).toBe(true);
+    expect(matchesDatasetTargetFilter(['agent', 'workflow'], 'workflow')).toBe(true);
+    expect(matchesDatasetTargetFilter([], 'agent')).toBe(false);
+    expect(matchesDatasetTargetFilter(['workflow'], 'agent')).toBe(false);
   });
 });
