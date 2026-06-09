@@ -1049,7 +1049,7 @@ export class AgentChannels {
     // Otherwise pass the parts array directly — both shapes match AgentSignalContents.
     const signalContents: AgentSignalContents = parts.length === 1 && parts[0]?.type === 'text' ? parts[0].text : parts;
 
-    const result = this.agent.sendMessage(
+    this.agent.sendMessage(
       {
         contents: signalContents,
         attributes,
@@ -1073,27 +1073,6 @@ export class AgentChannels {
         },
       },
     );
-
-    // In serverless runtimes (Vercel, Lambda) the function process is killed as
-    // soon as the webhook handler returns. Awaiting the owner stream's
-    // `consumeStream()` keeps the invocation alive until the run finishes so
-    // platform delivery (rendering chunks to Slack/Discord/etc) can complete.
-    // `consumeStream()` is idempotent and safe to call alongside the existing
-    // per-thread subscription consumer.
-    //
-    // The awaited promise resolves to `undefined` when this process lost a
-    // cross-process wake race — another process owns the run, so we just
-    // return and let the winner drive the stream.
-    if (result.ownerStream) {
-      try {
-        const ownerStream = await result.ownerStream;
-        if (ownerStream) {
-          await ownerStream.consumeStream();
-        }
-      } catch (err) {
-        this.log('debug', 'ownerStream consume failed', err);
-      }
-    }
   }
 
   /**
