@@ -63,7 +63,7 @@ export const UserMessage = () => {
       <DatasetSaveAction />
       <div
         className={cn(
-          'max-w-[max(366px,70%)] break-words px-4 py-2 text-neutral6 text-ui-lg leading-ui-lg rounded-xl bg-surface3',
+          'max-w-[max(366px,70%)] break-words whitespace-pre-wrap px-4 py-2 text-neutral6 text-ui-lg leading-ui-lg rounded-xl bg-surface3',
           isPending && 'opacity-60 animate-pulse',
         )}
       >
